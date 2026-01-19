@@ -85,8 +85,15 @@ pub(in crate::ui::state) fn handle_mode_selection_back(
 ///
 /// Transitions to the main menu screen.
 pub(in crate::ui::state) fn handle_select_training_mode(
-    _ctx: &mut HandlerContext<'_>,
+    ctx: &mut HandlerContext<'_>,
 ) -> Result<HandlerOutcome, UserError> {
+    // Reapply current sort mode when navigating to menu
+    let current_sort_mode = ctx.config.sort_mode;
+    let profile = &ctx.progress.profile;
+    ctx.game
+        .scenario_collection
+        .sort(current_sort_mode, Some(profile));
+
     Ok(HandlerOutcome::Transition(Box::new(TypedScreen::Menu(
         MenuData::default(),
     ))))
@@ -251,8 +258,8 @@ mod tests {
 
     #[test]
     fn test_select_training_mode() {
-        let (mut ui, mut game, mut progress, config) = create_test_context();
-        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &config);
+        let (mut ui, mut game, mut progress, mut config) = create_test_context();
+        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &mut config);
 
         let outcome = handle_select_training_mode(&mut ctx).unwrap();
 
@@ -264,8 +271,8 @@ mod tests {
 
     #[test]
     fn test_select_arcade_mode() {
-        let (mut ui, mut game, mut progress, config) = create_test_context();
-        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &config);
+        let (mut ui, mut game, mut progress, mut config) = create_test_context();
+        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &mut config);
 
         let outcome = handle_select_arcade_mode(&mut ctx).unwrap();
 
@@ -278,8 +285,8 @@ mod tests {
     #[test]
     fn test_mode_selection_select_training() {
         let mut data = ModeSelectionData::default(); // Default is 0 (Training)
-        let (mut ui, mut game, mut progress, config) = create_test_context();
-        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &config);
+        let (mut ui, mut game, mut progress, mut config) = create_test_context();
+        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &mut config);
 
         let outcome = handle_mode_selection_select(&mut data, &mut ctx).unwrap();
 
@@ -295,8 +302,8 @@ mod tests {
             selected_mode: 1,
             minigame_mode_selection: None,
         };
-        let (mut ui, mut game, mut progress, config) = create_test_context_with_scenarios();
-        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &config);
+        let (mut ui, mut game, mut progress, mut config) = create_test_context_with_scenarios();
+        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &mut config);
 
         let outcome = handle_mode_selection_select(&mut data, &mut ctx).unwrap();
 
@@ -376,8 +383,8 @@ mod tests {
 
     #[test]
     fn test_launch_survival_mode() {
-        let (mut ui, mut game, mut progress, config) = create_test_context_with_scenarios();
-        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &config);
+        let (mut ui, mut game, mut progress, mut config) = create_test_context_with_scenarios();
+        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &mut config);
 
         let mode =
             crate::minigame::MiniGameMode::Survival(crate::minigame::SurvivalConfig::default());
@@ -398,8 +405,8 @@ mod tests {
 
     #[test]
     fn test_launch_challenge_mode() {
-        let (mut ui, mut game, mut progress, config) = create_test_context_with_scenarios();
-        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &config);
+        let (mut ui, mut game, mut progress, mut config) = create_test_context_with_scenarios();
+        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &mut config);
 
         let mode =
             crate::minigame::MiniGameMode::Challenge(crate::minigame::ChallengeConfig::for_today());
@@ -417,8 +424,8 @@ mod tests {
 
     #[test]
     fn test_launch_no_scenarios() {
-        let (mut ui, mut game, mut progress, config) = create_test_context(); // No scenarios
-        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &config);
+        let (mut ui, mut game, mut progress, mut config) = create_test_context(); // No scenarios
+        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &mut config);
 
         let mode = crate::minigame::MiniGameMode::default();
         let outcome = handle_launch_minigame_mode(&mut ctx, mode).unwrap();
@@ -435,8 +442,8 @@ mod tests {
             selected_mode: 99, // Invalid index
             minigame_mode_selection: None,
         };
-        let (mut ui, mut game, mut progress, config) = create_test_context();
-        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &config);
+        let (mut ui, mut game, mut progress, mut config) = create_test_context();
+        let mut ctx = HandlerContext::new(&mut ui, &mut game, &mut progress, &mut config);
 
         let outcome = handle_mode_selection_select(&mut data, &mut ctx).unwrap();
 

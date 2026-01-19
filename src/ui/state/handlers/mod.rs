@@ -26,6 +26,10 @@ pub(super) use mode_selection::{
 pub(super) use navigation::{handle_back_to_menu, handle_navigate_to, handle_quit_app};
 pub(super) use profile::{handle_award_xp, handle_show_profile, handle_show_statistics};
 pub(super) use quests::{format_quest_description, handle_update_quest_progress};
+pub(super) use sort_mode_selection::{
+    handle_show_sort_mode_selection, handle_sort_mode_selection_down,
+    handle_sort_mode_selection_select, handle_sort_mode_selection_up,
+};
 // Shared quest tracking functions for both training and arcade modes
 pub(super) use notifications::{handle_cleanup_notifications, handle_show_notification};
 pub(super) use quests::{
@@ -53,3 +57,4 @@ mod profile;
 mod quests;
 mod review;
 mod scenario;
+mod sort_mode_selection;

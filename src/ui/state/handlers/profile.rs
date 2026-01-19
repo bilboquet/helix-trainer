@@ -112,7 +112,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_start_minigame(&mut ctx).unwrap();
         crate::ui::state::apply_outcome(state, outcome);
@@ -127,7 +127,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_show_profile(&mut ctx).unwrap();
 
@@ -150,7 +150,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_show_statistics(&mut ctx).unwrap();
 
@@ -186,7 +186,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_show_profile(&mut ctx).unwrap();
 
@@ -219,7 +219,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_show_statistics(&mut ctx).unwrap();
 
@@ -252,7 +252,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_show_profile(&mut ctx).unwrap();
 
@@ -278,7 +278,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         // Award small amount of XP (shouldn't level up)
@@ -311,7 +311,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         // Award enough XP to level up
@@ -346,7 +346,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         // Award massive XP to jump multiple levels
@@ -370,7 +370,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         // Award zero XP
@@ -396,7 +396,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         // Award XP to trigger level up
@@ -418,7 +418,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         // Award large amount (test overflow protection)

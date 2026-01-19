@@ -44,7 +44,7 @@ pub struct HandlerContext<'a> {
     /// User progress (profile, learning, achievements)
     pub progress: &'a mut ProgressState,
     /// Application configuration (filters, settings)
-    pub config: &'a ConfigState,
+    pub config: &'a mut ConfigState,
 }
 
 impl<'a> HandlerContext<'a> {
@@ -66,7 +66,7 @@ impl<'a> HandlerContext<'a> {
         ui: &'a mut UIState,
         game: &'a mut GameState,
         progress: &'a mut ProgressState,
-        config: &'a ConfigState,
+        config: &'a mut ConfigState,
     ) -> Self {
         Self {
             ui,

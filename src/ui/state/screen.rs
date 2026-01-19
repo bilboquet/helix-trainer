@@ -88,6 +88,9 @@ pub enum TypedScreen {
     /// Category filters configuration screen
     CategoryFilters(CategoryFiltersData),
 
+    /// Sort mode selection screen
+    SortModeSelection(SortModeSelectionData),
+
     /// Review session screen
     Review(ReviewData),
 
@@ -106,6 +109,7 @@ impl TypedScreen {
             Self::Profile(_) => "Profile",
             Self::Statistics(_) => "Statistics",
             Self::CategoryFilters(_) => "CategoryFilters",
+            Self::SortModeSelection(_) => "SortModeSelection",
             Self::Review(_) => "Review",
             Self::MiniGame(_) => "MiniGame",
         }
@@ -121,6 +125,7 @@ impl TypedScreen {
             Self::Profile(_) => super::Screen::Profile,
             Self::Statistics(_) => super::Screen::Statistics,
             Self::CategoryFilters(_) => super::Screen::CategoryFilters,
+            Self::SortModeSelection(_) => super::Screen::SortModeSelection,
             Self::Review(_) => super::Screen::Review,
             Self::MiniGame(_) => super::Screen::MiniGame,
         }
@@ -349,6 +354,15 @@ pub struct StatisticsData {
 #[derive(Debug, Clone, Default)]
 pub struct CategoryFiltersData {
     /// Index of currently selected category (0-indexed)
+    pub selected_index: usize,
+    /// Where to return when pressing Esc/back
+    pub return_to: ReturnDestination,
+}
+
+/// Data required for sort mode selection screen
+#[derive(Debug, Clone, Default)]
+pub struct SortModeSelectionData {
+    /// Index of currently selected sort mode (0-indexed)
     pub selected_index: usize,
     /// Where to return when pressing Esc/back
     pub return_to: ReturnDestination,

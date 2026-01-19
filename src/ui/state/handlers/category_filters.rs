@@ -207,7 +207,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_start_minigame(&mut ctx).unwrap();
         crate::ui::state::apply_outcome(state, outcome);
@@ -222,7 +222,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_show_category_filters(&mut ctx).unwrap();
 
@@ -254,7 +254,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_show_category_filters(&mut ctx).unwrap();
 
@@ -280,7 +280,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_category_filter_up(&mut data, &ctx).unwrap();
 
@@ -300,7 +300,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_category_filter_up(&mut data, &ctx).unwrap();
 
@@ -321,7 +321,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_category_filter_up(&mut data, &ctx).unwrap();
 
@@ -341,7 +341,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_category_filter_up(&mut data, &ctx).unwrap();
 
@@ -362,7 +362,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_category_filter_down(&mut data, &ctx).unwrap();
 
@@ -383,7 +383,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_category_filter_down(&mut data, &ctx).unwrap();
 
@@ -403,7 +403,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_category_filter_down(&mut data, &ctx).unwrap();
 
@@ -423,7 +423,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_category_filter_down(&mut data, &ctx).unwrap();
 
@@ -444,7 +444,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         // Verify no filter initially
@@ -476,7 +476,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         // Enable filter first
@@ -503,7 +503,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_category_filter_toggle(&data, &mut ctx).unwrap();
@@ -531,7 +531,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         // Enable a filter first
@@ -563,7 +563,7 @@ mod tests {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             crate::ui::state::handlers::handle_toggle_difficulty_filter(
                 &mut ctx,
@@ -582,7 +582,7 @@ mod tests {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             handle_category_filter_toggle(&data, &mut ctx).unwrap();
         }
@@ -593,7 +593,7 @@ mod tests {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             handle_category_filter_select_all(&mut ctx).unwrap();
 

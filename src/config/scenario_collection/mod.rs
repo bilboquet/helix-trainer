@@ -76,6 +76,53 @@ pub enum SortMode {
     ByMastery,
 }
 
+impl SortMode {
+    /// Get all available sort modes in display order
+    ///
+    /// Returns all sort modes in the order they should be displayed in the UI.
+    pub fn all() -> Vec<Self> {
+        vec![
+            Self::ByDifficultyThenCategory, // Default/recommended
+            Self::ByName,
+            Self::ByDifficulty,
+            Self::ByCategory,
+            Self::ByCategoryThenDifficulty,
+            Self::ByProgress,
+            Self::ByMastery,
+        ]
+    }
+
+    /// Get display name for this sort mode
+    ///
+    /// Returns a user-friendly name suitable for display in the UI.
+    pub fn display_name(self) -> &'static str {
+        match self {
+            Self::ByName => "By Name",
+            Self::ByDifficulty => "By Difficulty",
+            Self::ByCategory => "By Category",
+            Self::ByProgress => "By Progress",
+            Self::ByCategoryThenDifficulty => "By Category, then Difficulty",
+            Self::ByDifficultyThenCategory => "By Difficulty, then Category",
+            Self::ByMastery => "By Mastery",
+        }
+    }
+
+    /// Get a short description for this sort mode
+    ///
+    /// Returns a brief description explaining what this sort mode does.
+    pub fn description(self) -> &'static str {
+        match self {
+            Self::ByName => "Alphabetical order",
+            Self::ByDifficulty => "Beginner → Intermediate → Advanced",
+            Self::ByCategory => "Group by category",
+            Self::ByProgress => "Uncompleted → Completed",
+            Self::ByCategoryThenDifficulty => "Category groups, then difficulty",
+            Self::ByDifficultyThenCategory => "Difficulty first, then category (recommended)",
+            Self::ByMastery => "Weak (low mastery) → Strong",
+        }
+    }
+}
+
 impl ScenarioCollection {
     /// Create a new collection from a vector of scenarios
     ///
@@ -146,10 +193,15 @@ impl ScenarioCollection {
 
             SortMode::ByProgress => {
                 if let Some(prof) = profile {
-                    self.filtered_indices.sort_by_key(|&idx| {
-                        // Completed scenarios go to the end
-                        let scenario_id = &self.scenarios[idx].id;
-                        prof.scenario_history.get(scenario_id).is_some()
+                    // Use sort_by for stable sorting: uncompleted first, then completed
+                    // Within each group, maintain original order (stable sort)
+                    self.filtered_indices.sort_by(|&a, &b| {
+                        let a_id = &self.scenarios[a].id;
+                        let b_id = &self.scenarios[b].id;
+                        let a_completed = prof.scenario_history.get(a_id).is_some();
+                        let b_completed = prof.scenario_history.get(b_id).is_some();
+                        // Uncompleted (false) comes before completed (true)
+                        a_completed.cmp(&b_completed)
                     });
                 }
                 // If no profile, don't change order

@@ -28,7 +28,14 @@ pub fn handle_data_message(state: &mut AppState, msg: DataLoadMessage) -> Result
     match msg {
         DataLoadMessage::ScenariosReady(scenarios) => {
             let count = scenarios.len();
+            let current_sort_mode = state.config.sort_mode;
             state.game.scenario_collection = ScenarioCollection::new(scenarios);
+            // Reapply the user's chosen sort mode after loading scenarios
+            let profile = &state.progress.profile;
+            state
+                .game
+                .scenario_collection
+                .sort(current_sort_mode, Some(profile));
             tracing::info!(count, "Scenarios loaded");
         }
 

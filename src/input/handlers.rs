@@ -208,6 +208,7 @@ pub fn handle_menu_keys(key: KeyEvent, state: &mut AppState) -> Option<Message> 
                 'p' => return Some(Message::ShowProfile),
                 's' => return Some(Message::ShowStatistics),
                 'f' => return Some(Message::ShowCategoryFilters),
+                't' => return Some(Message::ShowSortModeSelection),
                 'G' => return Some(Message::MenuJumpToLast),
                 'M' => return Some(Message::ToggleSound),
                 _ => {}
@@ -427,6 +428,29 @@ pub fn handle_category_filters_keys(key: KeyEvent) -> Option<Message> {
         KeyCode::Up | KeyCode::Char('k') => Some(Message::CategoryFilterUp),
         KeyCode::Char(' ') | KeyCode::Enter => Some(Message::CategoryFilterToggle),
         KeyCode::Char('a') => Some(Message::CategoryFilterSelectAll),
+        KeyCode::Esc | KeyCode::Char('q') => Some(Message::BackToMenu),
+        _ => None,
+    }
+}
+
+/// Handle keyboard events on sort mode selection screen
+///
+/// Key bindings:
+/// - `j` or `Down` - Move selection down (SortModeSelectionDown)
+/// - `k` or `Up` - Move selection up (SortModeSelectionUp)
+/// - `Enter` - Select current sort mode (SortModeSelectionSelect)
+/// - `Esc` or `q` - Return to previous screen (BackToMenu)
+/// - `Ctrl-Q` - Return to previous screen (BackToMenu)
+pub fn handle_sort_mode_selection_keys(key: KeyEvent) -> Option<Message> {
+    // Ctrl-Q returns to previous screen (unified exit key)
+    if key.code == KeyCode::Char('q') && key.modifiers.contains(KeyModifiers::CONTROL) {
+        return Some(Message::BackToMenu);
+    }
+
+    match key.code {
+        KeyCode::Down | KeyCode::Char('j') => Some(Message::SortModeSelectionDown),
+        KeyCode::Up | KeyCode::Char('k') => Some(Message::SortModeSelectionUp),
+        KeyCode::Enter => Some(Message::SortModeSelectionSelect),
         KeyCode::Esc | KeyCode::Char('q') => Some(Message::BackToMenu),
         _ => None,
     }

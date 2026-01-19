@@ -110,7 +110,7 @@ pub fn handle_menu_select(
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         super::scenario::handle_start_scenario(&mut ctx, selected)
     } else if selected == scenario_count {
@@ -119,7 +119,7 @@ pub fn handle_menu_select(
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         super::review::handle_start_review_session(&mut ctx)
     } else if selected == scenario_count + 1 {
@@ -128,7 +128,7 @@ pub fn handle_menu_select(
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         super::profile::handle_show_profile(&mut ctx)
     } else if selected == scenario_count + 2 {
@@ -137,7 +137,7 @@ pub fn handle_menu_select(
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         super::profile::handle_show_statistics(&mut ctx)
     } else if selected == scenario_count + 3 {

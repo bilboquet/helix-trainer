@@ -148,6 +148,17 @@ pub fn handle_complete_scenario(state: &mut AppState) -> Result<HandlerOutcome, 
                 .map_err(UserError::from)?
         } else {
             // No session either, just go to menu with restored position
+            // Reapply current sort mode when returning to menu
+            let ctx = HandlerContext::new(
+                &mut state.ui,
+                &mut state.game,
+                &mut state.progress,
+                &mut state.config,
+            );
+            ctx.game
+                .scenario_collection
+                .sort(ctx.config.sort_mode, Some(&ctx.progress.profile));
+
             return Ok(HandlerOutcome::Transition(Box::new(TypedScreen::Menu(
                 MenuData {
                     selected_item: state.ui.last_menu_selected,
@@ -181,7 +192,7 @@ pub fn handle_complete_scenario(state: &mut AppState) -> Result<HandlerOutcome, 
         &mut state.ui,
         &mut state.game,
         &mut state.progress,
-        &state.config,
+        &mut state.config,
     );
 
     let is_first_today = ctx.progress.scenarios_completed_today == 0;
@@ -221,6 +232,11 @@ pub fn handle_complete_scenario(state: &mut AppState) -> Result<HandlerOutcome, 
     let Some(session) = completed_session else {
         // No completed session available - go back to menu with restored position
         // This shouldn't happen in normal flow, but handle gracefully
+        // Reapply current sort mode when returning to menu
+        ctx.game
+            .scenario_collection
+            .sort(ctx.config.sort_mode, Some(&ctx.progress.profile));
+
         let selected = ctx.ui.last_menu_selected;
         let scroll = ctx.ui.last_menu_scroll;
         ctx.ui.clear_temp_results();
@@ -352,6 +368,11 @@ pub fn handle_go_to_scenario_list(
     results_data: &ResultsData,
     ctx: &mut HandlerContext<'_>,
 ) -> Result<HandlerOutcome, UserError> {
+    // Reapply current sort mode when returning to menu
+    ctx.game
+        .scenario_collection
+        .sort(ctx.config.sort_mode, Some(&ctx.progress.profile));
+
     // Determine selected position with auto-advance for completed scenarios
     let selected = if results_data.session.is_completed() {
         // Auto-advance: move to next scenario after successful completion
@@ -422,7 +443,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_start_scenario(&mut ctx, 0).unwrap();
@@ -442,7 +463,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_start_scenario(&mut ctx, 999).unwrap();
@@ -494,7 +515,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let screen = handle_retry_scenario(results_data, &mut ctx).unwrap();
@@ -518,7 +539,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let screen = handle_retry_scenario(results_data, &mut ctx).unwrap();
@@ -533,7 +554,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_next_scenario(&mut ctx).unwrap();
@@ -551,7 +572,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let bonuses = collect_quest_bonuses(&mut ctx);
@@ -579,7 +600,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let bonuses = collect_quest_bonuses(&mut ctx);
@@ -618,7 +639,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let bonuses = collect_quest_bonuses(&mut ctx);
@@ -716,7 +737,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_start_scenario(&mut ctx, 0).unwrap();
@@ -753,7 +774,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_next_scenario(&mut ctx).unwrap();
@@ -817,7 +838,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_next_lesson(&results_data, &mut ctx).unwrap();
@@ -844,7 +865,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_next_lesson(&results_data, &mut ctx).unwrap();
@@ -865,7 +886,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_next_lesson(&results_data, &mut ctx).unwrap();
@@ -890,7 +911,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_go_to_scenario_list(&results_data, &mut ctx).unwrap();
@@ -915,7 +936,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_go_to_scenario_list(&results_data, &mut ctx).unwrap();
@@ -942,7 +963,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_start_scenario(&mut ctx, 1).unwrap();
@@ -977,7 +998,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let screen = handle_retry_scenario(results_data, &mut ctx).unwrap();
@@ -1024,7 +1045,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         // Start scenario at index 2
@@ -1055,7 +1076,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_next_scenario(&mut ctx).unwrap();
@@ -1108,7 +1129,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_go_to_scenario_list(&results_data, &mut ctx).unwrap();
@@ -1143,7 +1164,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_go_to_scenario_list(&results_data, &mut ctx).unwrap();
@@ -1193,7 +1214,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_go_to_scenario_list(&results_data, &mut ctx).unwrap();
@@ -1225,7 +1246,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         let outcome = handle_next_lesson(&results_data, &mut ctx).unwrap();

@@ -398,7 +398,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_start_minigame(&mut ctx).unwrap();
         crate::ui::state::apply_outcome(state, outcome);
@@ -443,7 +443,7 @@ mod tests {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             handle_pause_minigame(&mut ctx).unwrap();
         }
@@ -457,7 +457,7 @@ mod tests {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             handle_resume_minigame(&mut ctx).unwrap();
         }
@@ -495,7 +495,7 @@ mod tests {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             handle_minigame_tick(&mut ctx).unwrap();
         }
@@ -867,7 +867,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_minigame_scenario_complete(&mut ctx).unwrap();
 
@@ -891,7 +891,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         let outcome = handle_minigame_next_scenario(&mut ctx).unwrap();
 
@@ -938,7 +938,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         // Should handle gracefully without session
@@ -953,7 +953,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
 
         // Should handle gracefully without session
@@ -983,7 +983,7 @@ mod tests {
             &mut state.ui,
             &mut state.game,
             &mut state.progress,
-            &state.config,
+            &mut state.config,
         );
         handle_minigame_tick(&mut ctx).unwrap();
 

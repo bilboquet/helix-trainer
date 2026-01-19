@@ -42,7 +42,7 @@ pub mod screen;
 pub use screen::{
     CategoryFiltersData, CommandBufferAccess, CompletedOrAbandoned, InputStateAccess, KeyHistory,
     MenuData, MiniGameData, MiniGameModeSelection, ModeSelectionData, ProfileData, ResultsData,
-    ReturnDestination, ReviewData, StatisticsData, TaskData, TypedScreen,
+    ReturnDestination, ReviewData, SortModeSelectionData, StatisticsData, TaskData, TypedScreen,
 };
 
 /// Breakdown of XP earned from a scenario
@@ -101,6 +101,8 @@ pub enum Screen {
     Statistics,
     /// Category filters configuration screen
     CategoryFilters,
+    /// Sort mode selection screen
+    SortModeSelection,
     /// Review session screen for spaced repetition
     Review,
     /// Mini-game mode (Arcade Mode)
@@ -265,6 +267,18 @@ pub enum Message {
 
     /// Reset category filters to show all categories
     CategoryFilterSelectAll,
+
+    /// Navigate to sort mode selection screen
+    ShowSortModeSelection,
+
+    /// Move selection up in sort mode selection screen
+    SortModeSelectionUp,
+
+    /// Move selection down in sort mode selection screen
+    SortModeSelectionDown,
+
+    /// Select current sort mode in selection screen
+    SortModeSelectionSelect,
 
     /// Start a review session
     StartReviewSession,
@@ -470,7 +484,7 @@ macro_rules! extract_screen {
                 &mut $state.ui,
                 &mut $state.game,
                 &mut $state.progress,
-                &$state.config,
+                &mut $state.config,
             );
             let outcome = $handler?;
             apply_outcome($state, outcome);
@@ -491,7 +505,7 @@ macro_rules! extract_screen {
                 &mut $state.ui,
                 &mut $state.game,
                 &mut $state.progress,
-                &$state.config,
+                &mut $state.config,
             );
             let outcome = $handler?;
             apply_outcome($state, outcome);
@@ -549,14 +563,20 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_quit_app(&mut ctx)?;
             apply_outcome(state, outcome);
             Ok(())
         }
         Message::NavigateTo(screen) => {
-            let outcome = handlers::handle_navigate_to(screen)?;
+            let mut ctx = HandlerContext::new(
+                &mut state.ui,
+                &mut state.game,
+                &mut state.progress,
+                &mut state.config,
+            );
+            let outcome = handlers::handle_navigate_to(screen, &mut ctx)?;
             apply_outcome(state, outcome);
             Ok(())
         }
@@ -567,7 +587,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_back_to_menu(current_screen_ref, &mut ctx)?;
             apply_outcome(state, outcome);
@@ -592,7 +612,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_select_training_mode(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -603,7 +623,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_select_arcade_mode(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -614,7 +634,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_start_minigame(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -627,7 +647,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_pause_minigame(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -638,7 +658,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_resume_minigame(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -649,7 +669,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_minigame_tick(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -662,7 +682,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_minigame_scenario_complete(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -673,7 +693,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_minigame_next_scenario(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -735,7 +755,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_start_scenario(&mut ctx, index)?;
             apply_outcome(state, outcome);
@@ -780,7 +800,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                     &mut state.ui,
                     &mut state.game,
                     &mut state.progress,
-                    &state.config,
+                    &mut state.config,
                 );
                 let new_screen = handlers::handle_retry_scenario(results_data, &mut ctx)?;
                 state.screen = new_screen;
@@ -796,7 +816,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_next_scenario(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -808,7 +828,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                     &mut state.ui,
                     &mut state.game,
                     &mut state.progress,
-                    &state.config,
+                    &mut state.config,
                 );
                 let outcome = handlers::handle_next_lesson(results_data, &mut ctx)?;
                 apply_outcome(state, outcome);
@@ -825,7 +845,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                     &mut state.ui,
                     &mut state.game,
                     &mut state.progress,
-                    &state.config,
+                    &mut state.config,
                 );
                 let outcome = handlers::handle_go_to_scenario_list(results_data, &mut ctx)?;
                 apply_outcome(state, outcome);
@@ -855,7 +875,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_show_profile(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -866,7 +886,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_show_statistics(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -877,7 +897,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             handlers::handle_award_xp(&mut ctx, amount)
         }
@@ -902,18 +922,39 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_set_sort_mode(&mut ctx, mode)?;
             apply_outcome(state, outcome);
             Ok(())
+        }
+        // Sort mode selection screen messages
+        Message::ShowSortModeSelection => {
+            let mut ctx = HandlerContext::new(
+                &mut state.ui,
+                &mut state.game,
+                &mut state.progress,
+                &mut state.config,
+            );
+            let outcome = handlers::handle_show_sort_mode_selection(&mut ctx)?;
+            apply_outcome(state, outcome);
+            Ok(())
+        }
+        Message::SortModeSelectionUp => {
+            extract_screen!(state, SortModeSelection, mut data, ctx => handlers::handle_sort_mode_selection_up(data, &ctx))
+        }
+        Message::SortModeSelectionDown => {
+            extract_screen!(state, SortModeSelection, mut data, ctx => handlers::handle_sort_mode_selection_down(data, &ctx))
+        }
+        Message::SortModeSelectionSelect => {
+            extract_screen!(state, SortModeSelection, data, ctx => handlers::handle_sort_mode_selection_select(data, &mut ctx))
         }
         Message::ToggleCategoryFilter(category) => {
             let mut ctx = HandlerContext::new(
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_toggle_category_filter(&mut ctx, category)?;
             apply_outcome(state, outcome);
@@ -924,7 +965,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_toggle_difficulty_filter(&mut ctx, difficulty)?;
             apply_outcome(state, outcome);
@@ -935,7 +976,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_toggle_completed_filter(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -946,7 +987,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_reset_filters(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -959,7 +1000,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_show_category_filters(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -979,7 +1020,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_category_filter_select_all(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -992,7 +1033,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_start_review_session(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -1003,7 +1044,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_complete_review_command(&mut ctx, success)?;
             apply_outcome(state, outcome);
@@ -1014,7 +1055,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_next_review_command(&mut ctx)?;
             apply_outcome(state, outcome);
@@ -1025,7 +1066,7 @@ pub fn update(state: &mut AppState, msg: Message) -> Result<(), UserError> {
                 &mut state.ui,
                 &mut state.game,
                 &mut state.progress,
-                &state.config,
+                &mut state.config,
             );
             let outcome = handlers::handle_abandon_review_session(&mut ctx)?;
             apply_outcome(state, outcome);
